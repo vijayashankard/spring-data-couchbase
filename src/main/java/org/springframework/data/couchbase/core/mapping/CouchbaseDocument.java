@@ -20,6 +20,7 @@ import com.couchbase.client.java.json.JsonObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * A {@link CouchbaseDocument} is an abstract representation of a document stored inside Couchbase Server.
@@ -281,6 +282,9 @@ public class CouchbaseDocument implements CouchbaseStorable {
 		}
 		final Class<?> clazz = value.getClass();
 		if (CouchbaseSimpleTypes.DOCUMENT_TYPES.isSimpleType(clazz)) {
+			return;
+		}
+		if (clazz.isAssignableFrom(Optional.class)){
 			return;
 		}
 		throw new IllegalArgumentException(

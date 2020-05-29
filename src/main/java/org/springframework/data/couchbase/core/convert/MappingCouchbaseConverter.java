@@ -39,6 +39,7 @@ import org.springframework.data.couchbase.core.mapping.CouchbaseList;
 import org.springframework.data.couchbase.core.mapping.CouchbaseMappingContext;
 import org.springframework.data.couchbase.core.mapping.CouchbasePersistentEntity;
 import org.springframework.data.couchbase.core.mapping.CouchbasePersistentProperty;
+import org.springframework.data.couchbase.core.mapping.event.AfterConvertCallback;
 import org.springframework.data.couchbase.core.mapping.id.GeneratedValue;
 import org.springframework.data.couchbase.core.mapping.id.IdAttribute;
 import org.springframework.data.couchbase.core.mapping.id.IdPrefix;
@@ -260,6 +261,9 @@ public class MappingCouchbaseConverter extends AbstractCouchbaseConverter implem
 					return;
 				}
 				Object obj = prop.isIdProperty() ? source.getId() : getValueInternal(prop, source, instance);
+				if ( obj == null && prop.getTypeInformation().getType().isAssignableFrom(Optional.class) ){
+					obj = Optional.empty();
+				}
 				accessor.setProperty(prop, obj);
 			}
 

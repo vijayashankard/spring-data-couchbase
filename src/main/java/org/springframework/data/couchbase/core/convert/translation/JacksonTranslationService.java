@@ -20,7 +20,9 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Map;
+import java.util.Optional;
 
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.couchbase.core.mapping.CouchbaseDocument;
 import org.springframework.data.couchbase.core.mapping.CouchbaseList;
@@ -101,12 +103,15 @@ public class JacksonTranslationService implements TranslationService, Initializi
 				continue;
 			}
 
-			final Class<?> clazz = value.getClass();
-
-			if (simpleTypeHolder.isSimpleType(clazz) && !isEnumOrClass(clazz)) {
-				generator.writeObject(value);
+			if(value != null) {
+				final Class<?> clazz = value.getClass();
+				if (simpleTypeHolder.isSimpleType(clazz) && !isEnumOrClass(clazz)) {
+					generator.writeObject(value);
+				} else {
+					objectMapper.writeValue(generator, value);
+				}
 			} else {
-				objectMapper.writeValue(generator, value);
+				generator.writeObject(null);
 			}
 
 		}
@@ -247,6 +252,7 @@ public class JacksonTranslationService implements TranslationService, Initializi
 			objectMapper = new ObjectMapper();
 		}
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		objectMapper.registerModule(new Jdk8Module());
 	}
 
 }
